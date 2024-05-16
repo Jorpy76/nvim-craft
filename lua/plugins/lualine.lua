@@ -5,12 +5,14 @@ return {
       options = {
         globalstatus = true,
         theme = "catppuccin-mocha",
-        sections = {
-          lualine_a = {
-            file = 1,
-          },
+      },
+      sections = {
+        lualine_c = {
+          { "filename" ,
+           "file_status", path = 1 },
         },
       },
     })
   end,
 }
+

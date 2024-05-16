@@ -35,3 +35,21 @@ vim.keymap.set("n", "<C-b>", ":NvimTreeToggle<CR>", {}) -- open/close
 -- Buffers
 vim.keymap.set("n", "<Tab>", "<Cmd>BufferLineCycleNext<CR>")
 vim.keymap.set("n", "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>")
+
+--Lazygit
+vim.keymap.set('n', '<leader>lg', ':LazyGit<CR>', { silent = true })
+
+
+-- Diffview
+vim.keymap.set('n', 'gH', ':DiffviewFileHistory<CR>',{ noremap = true, silent = true } )
+vim.keymap.set('n', 'gv', function()
+  if next(require('diffview.lib').views) == nil then
+    vim.cmd('DiffviewOpen')
+  else
+    vim.cmd('DiffviewClose')
+  end
+end,{ noremap = true, silent = true } )
+
+--Rest
+
+
