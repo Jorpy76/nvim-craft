@@ -424,5 +424,36 @@
 			"});",
 			""
 		]
-	}
+	},
+  "Full Page": {
+  "prefix": "qpage",
+  "description": "Simple page component",
+  "body": [
+    "import { component$ } from '@builder.io/qwik';",
+    "",
+    "export default component$(() => {",
+    "  $0",
+    "})"
+  ]
+},
+  "fragment": {
+    "prefix": "frag",
+    "description": "Fragment",
+    "body": ["<></>$0"]
+},
+  "Qwik Export Component": {
+    "prefix": "q-export-component",
+    "description": "Creates a Qwik component with default export.",
+    "body": [
+        "import { component$ } from \"@builder.io/qwik\";",
+        "",
+        "export default component$(() => {",
+        "  return (",
+        "    <>",
+        "    $0",
+        "    </>",
+        "  );",
+        "});"
+    ]
+}
 }
