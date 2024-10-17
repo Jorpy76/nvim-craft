@@ -14,7 +14,8 @@ return {
 					extra_filetypes = { "svelte", "astro" },
 				}),
 			},
-			-- timeout_ms = 10000,
+			timeout_ms = 20000,
+      autostart = true,
 		})
 
 		vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})

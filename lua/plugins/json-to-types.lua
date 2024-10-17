@@ -4,12 +4,12 @@ return {
 	keys = {
 		{
 			"<leader>cu",
-			"<CMD>ConvertJSONtoTS<CR>",
+      "<CMD>ConvertJSONtoLang typescript<CR>",
 			desc = "Convert JSON to TS",
 		},
 		{
 			"<leader>ct",
-			"<CMD>ConvertJSONtoTSBuffer<CR>",
+      "<CMD>ConvertJSONtoLangBuffer typescript<CR>",
 			desc = "Convert JSON to TS in buffer",
 		},
 	},

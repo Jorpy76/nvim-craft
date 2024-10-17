@@ -20,6 +20,7 @@ return {
       ls.filetype_extend("javascriptreact", { "html" })
       ls.filetype_extend("typescriptreact", { "html" })
       ls.filetype_extend("astro", {"html"})
+      ls.filetype_extend("svelte", {"html"})
 
       vim.keymap.set({ "i", "s" }, "<c-k>", function()
         if ls.expand_or_jumpable() then
