@@ -10,17 +10,13 @@ return {
     },
     config = function()
       local ls = require("luasnip")
-      require("luasnip.loaders.from_vscode").lazy_load()
-
-      -- Ruta a tu archivo de snippets personalizado
-      -- local snippet_path = vim.fn.stdpath("config") .. "/lua/snippets/qwik.json"
       require("luasnip.loaders.from_vscode").lazy_load({ paths = { "/home/jorgeriosf/.config/craft/snippets"} })
 
       -- Extiende filetypes si es necesario
       ls.filetype_extend("javascriptreact", { "html" })
       ls.filetype_extend("typescriptreact", { "html" })
-      ls.filetype_extend("astro", {"html"})
-      ls.filetype_extend("svelte", {"html"})
+      ls.filetype_extend("astro", { "html" })
+      ls.filetype_extend("svelte", { "html" })
 
       vim.keymap.set({ "i", "s" }, "<c-k>", function()
         if ls.expand_or_jumpable() then
@@ -36,12 +32,17 @@ return {
   },
   {
     "hrsh7th/nvim-cmp",
+    dependencies = {
+      "luckasRanarison/tailwind-tools.nvim",
+      "onsails/lspkind-nvim",
+    },
     config = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
+      local lspkind = require("lspkind")
+      local tailwind_tools = require("tailwind-tools.cmp")
+
       require("luasnip.loaders.from_vscode").lazy_load()
-      require("luasnip").filetype_extend("javascriptreact", { "html" })
-      require("luasnip").filetype_extend("typescriptreact", { "html" })
 
       cmp.setup({
         snippet = {
@@ -49,64 +50,6 @@ return {
             require("luasnip").lsp_expand(args.body)
           end,
         },
-        formatting = {
-          format = function(entry, vim_item)
-            local KIND_ICONS = {
-              Tailwind = "󰹞󰹞󰹞󰹞󰹞󰹞󰹞󰹞",
-              Color = " ",
-              -- Class = 7,
-              -- Constant = '󰚞',
-              -- Constructor = 4,
-              -- Enum = 13,
-              -- EnumMember = 20,
-              -- Event = 23,
-              -- Field = 5,
-              -- File = 17,
-              -- Folder = 19,
-              -- Function = 3,
-              -- Interface = 8,
-              -- Keyword = 14,
-              -- Method = 2,
-              -- Module = 9,
-              -- Operator = 24,
-              -- Property = 10,
-              -- Reference = 18,
-              Snippet = " ",
-              -- Struct = 22,
-              -- Text = "",
-              -- TypeParameter = 25,
-              -- Unit = 11,
-              -- Value = 12,
-              -- Variable = 6
-            }
-            if vim_item.kind == "Color" and entry.completion_item.documentation then
-              local _, _, r, g, b =
-              ---@diagnostic disable-next-line: param-type-mismatch
-                  string.find(entry.completion_item.documentation, "^rgb%((%d+), (%d+), (%d+)")
-
-              if r and g and b then
-                local color = string.format("%02x", r)
-                    .. string.format("%02x", g)
-                    .. string.format("%02x", b)
-                local group = "Tw_" .. color
-
-                if vim.api.nvim_call_function("hlID", { group }) < 1 then
-                  vim.api.nvim_command("highlight" .. " " .. group .. " " .. "guifg=#" .. color)
-                end
-
-                vim_item.kind = KIND_ICONS.Tailwind
-                vim_item.kind_hl_group = group
-
-                return vim_item
-              end
-            end
-
-            vim_item.kind = KIND_ICONS[vim_item.kind] or vim_item.kind
-
-            return vim_item
-          end,
-        },
-
         window = {
           completion = cmp.config.window.bordered(),
           documentation = cmp.config.window.bordered(),
@@ -138,11 +81,17 @@ return {
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
-          { name = "luasnip" }, -- For luasnip users.
+          { name = "luasnip" },
         }, {
           { name = "buffer" },
         }),
+        formatting = {
+          format = lspkind.cmp_format({
+            before = tailwind_tools.lspkind_format,
+          }),
+        },
       })
     end,
   },
 }
+

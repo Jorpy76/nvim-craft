@@ -14,6 +14,11 @@ vim.opt.swapfile = false
 vim.wo.cursorline = true
 vim.o.clipboard = "unnamedplus"
 
+-- Guardar todos los archivos abiertos con Ctrl+s
+vim.keymap.set("n", "<C-s>", ":wa<CR>", { noremap = true, silent = true })
+vim.keymap.set("i", "<C-s>", "<Esc>:wa<CR>i", { noremap = true, silent = true })
+
+
 -- Navigate vim panes better
 vim.keymap.set("n", "<c-k>", ":wincmd k<CR>")
 vim.keymap.set("n", "<c-j>", ":wincmd j<CR>")
@@ -51,5 +56,4 @@ vim.keymap.set('n', 'gv', function()
 end,{ noremap = true, silent = true } )
 
 --Rest
-
 
