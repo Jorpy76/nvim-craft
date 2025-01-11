@@ -1,3 +1,10 @@
+-- Ajuste de líneas largas
+vim.cmd("set wrap")          -- Habilitar ajuste de línea
+vim.cmd([[set showbreak=↪]]) -- Agregar un indicador visual
+vim.cmd("set breakindent")   -- Asegurar indentación en las líneas ajustadas
+vim.cmd("set linebreak")     -- Asegura que los saltos de línea solo ocurran en los espacios
+vim.cmd("set wrapscan")      -- Permite hacer ajuste en todo el archivo
+
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")

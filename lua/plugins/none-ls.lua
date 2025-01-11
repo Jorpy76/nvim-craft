@@ -1,29 +1,42 @@
 return {
-	"nvimtools/none-ls.nvim",
-	config = function()
-		local null_ls = require("null-ls")
-		null_ls.setup({
-			sources = {
-				null_ls.builtins.formatting.stylua,
-				--null_ls.builtins.formatting.prettier,
-				null_ls.builtins.diagnostics.erb_lint,
-				null_ls.builtins.diagnostics.rubocop,
-				null_ls.builtins.formatting.rubocop,
-				null_ls.builtins.formatting.biome,
-				null_ls.builtins.formatting.prettier.with({
-					extra_filetypes = { "svelte", "astro" },
-				}),
-			},
-			timeout_ms = 20000,
-      autostart = true,
-		})
+    "nvimtools/none-ls.nvim",
+    config = function()
+        local null_ls = require("null-ls")
 
-		vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
-		-- vim.keymap.set("n", "<leader>gf", function()
-		-- 	vim.lsp.buf.format({
-		-- 		async = false,
-		-- 		timeout_ms = 10000, -- Tiempo de espera específico para el formateo
-		-- 	})
-		-- end, { desc = "Format file" })
-	end,
+        -- Función para verificar si un formateador específico debe ejecutarse según el tipo de archivo.
+        local function should_use_biome(filetype)
+            local biome_filetypes = {
+                json = true,
+                css = true,
+                graphql = true,
+                javascript = true,
+                javascriptreact = true,
+                typescript = true,
+                typescriptreact = true,
+                jsonc = true,
+            }
+            return biome_filetypes[filetype] ~= nil
+        end
+
+        null_ls.setup({
+            sources = {
+                null_ls.builtins.formatting.biome.with({
+                    condition = function(utils)
+                        return should_use_biome(vim.bo.filetype) -- Verifica si debe usarse biome.
+                    end,
+                }),
+                null_ls.builtins.formatting.prettier.with({
+                    condition = function(utils)
+                        return not should_use_biome(vim.bo.filetype)
+                    end,
+                    extra_filetypes = { "svelte", "astro" },
+                }),
+            },
+            timeout_ms = 20000,
+            autostart = true,
+        })
+
+        vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
+    end,
 }
+
