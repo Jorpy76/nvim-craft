@@ -40,8 +40,8 @@ return { {
     },
     renderer = {
       root_folder_label = false,
-      highlight_git = false,
-      highlight_opened_files = "none",
+      highlight_git = true,
+      highlight_opened_files = "name",
 
       indent_markers = {
         enable = false

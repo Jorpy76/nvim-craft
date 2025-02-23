@@ -62,5 +62,7 @@ vim.keymap.set('n', 'gv', function()
   end
 end,{ noremap = true, silent = true } )
 
+--Zen-mode
+vim.keymap.set('n', '<leader>z', ':ZenMode<CR>', { noremap = true, silent = true })
 --Rest
 

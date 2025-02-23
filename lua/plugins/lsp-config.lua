@@ -46,6 +46,11 @@ return {
       lspconfig.lua_ls.setup({
         capabilities = capabilities
       })
+      lspconfig.marksman.setup({
+        capabilities = capabilities,
+        filetypes = { "markdown" },
+      })
+
       lspconfig.tailwindcss.setup({
         capabilities = capabilities,
         filetypes = {
