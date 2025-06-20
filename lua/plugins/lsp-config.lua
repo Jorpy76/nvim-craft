@@ -19,7 +19,7 @@ return {
     config = function()
       -- Configuración de diagnósticos
       vim.diagnostic.config({
-        virtual_text = false, -- Deshabilitar texto en línea
+        virtual_text = true, -- Deshabilitar texto en línea
         float = {
           border = "rounded", -- Usar bordes redondeados para el popup
           source = "always",  -- Mostrar la fuente del mensaje
