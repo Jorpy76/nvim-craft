@@ -1,9 +1,9 @@
 -- Ajuste de líneas largas
-vim.cmd("set wrap")          -- Habilitar ajuste de línea
+vim.cmd("set wrap") -- Habilitar ajuste de línea
 vim.cmd([[set showbreak=↪]]) -- Agregar un indicador visual
-vim.cmd("set breakindent")   -- Asegurar indentación en las líneas ajustadas
-vim.cmd("set linebreak")     -- Asegura que los saltos de línea solo ocurran en los espacios
-vim.cmd("set wrapscan")      -- Permite hacer ajuste en todo el archivo
+vim.cmd("set breakindent") -- Asegurar indentación en las líneas ajustadas
+vim.cmd("set linebreak") -- Asegura que los saltos de línea solo ocurran en los espacios
+vim.cmd("set wrapscan") -- Permite hacer ajuste en todo el archivo
 
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=2")
@@ -36,8 +36,8 @@ vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>")
 vim.wo.number = true
 
 -- Terminal
-vim.keymap.set("n", "<C-t>", ":ToggleTerm<CR>", { noremap = true, silent = true })
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+-- vim.keymap.set("n", "<C-t>", ":ToggleTerm<CR>", { noremap = true, silent = true })
+-- vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
 
 -- NvimTree
 vim.keymap.set("n", "<C-b>", ":NvimTreeToggle<CR>", {}) -- open/close
@@ -53,16 +53,15 @@ vim.keymap.set('n', '<leader>lg', ':LazyGit<CR>', { silent = true })
 
 
 -- Diffview
-vim.keymap.set('n', 'gH', ':DiffviewFileHistory<CR>',{ noremap = true, silent = true } )
+vim.keymap.set('n', 'gH', ':DiffviewFileHistory<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gv', function()
-  if next(require('diffview.lib').views) == nil then
-    vim.cmd('DiffviewOpen')
-  else
-    vim.cmd('DiffviewClose')
-  end
-end,{ noremap = true, silent = true } )
+    if next(require('diffview.lib').views) == nil then
+        vim.cmd('DiffviewOpen')
+    else
+        vim.cmd('DiffviewClose')
+    end
+end, { noremap = true, silent = true })
 
 --Zen-mode
 vim.keymap.set('n', '<leader>z', ':ZenMode<CR>', { noremap = true, silent = true })
 --Rest
-

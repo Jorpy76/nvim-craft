@@ -1,8 +1,8 @@
 return {
   "nvimtools/none-ls.nvim",
   dependencies = {
-    "jayp0521/mason-null-ls.nvim", -- para auto instalar linters/formatters
-    "nvimtools/none-ls-extras.nvim", -- para ruff y ruff_format
+    "jayp0521/mason-null-ls.nvim",   -- para auto instalar linters/formatters
+    "nvimtools/none-ls-extras.nvim", -- para ruff
   },
   config = function()
     local null_ls = require("null-ls")
@@ -29,9 +29,8 @@ return {
       ensure_installed = {
         "prettier",
         "biome",
-        "ruff",
-        "ruff_format",
-        -- agrega aquí otros linters/formatters que quieras
+        "ruff", -- Solo ruff
+        "shfmt",
       },
       automatic_installation = true,
     })
@@ -50,11 +49,10 @@ return {
         end,
         extra_filetypes = { "svelte", "astro" },
       }),
-      -- Python: Ruff y Ruff Format
-      require("none-ls.formatting.ruff").with({
-        extra_args = { "--extend-select", "I" },
-      }),
-      require("none-ls.formatting.ruff_format"),
+      -- Python: Ruff desde none-ls-extras
+      require("none-ls.formatting.ruff").with { extra_args = { "--extend-select", "I" } },
+      require 'none-ls.formatting.ruff_format',
+      null_ls.builtins.formatting.shfmt.with { args = { "-i", "4" } },
     }
 
     -- Autoformato al guardar (opcional, puedes quitar si no lo quieres)
@@ -77,6 +75,6 @@ return {
       end,
     })
 
-    vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
+    vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, {})
   end,
 }
