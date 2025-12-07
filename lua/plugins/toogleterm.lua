@@ -6,13 +6,8 @@ return {
             -- === CONFIGURACIÓN GENERAL ===
             -- Hemos quitado 'open_mapping' y 'direction' de aquí
             -- para que no haya una terminal "por defecto" preconfigurada.
-            size = function(term)
-                if term.direction == "horizontal" then
-                    return 15                  -- 15 líneas para la horizontal
-                elseif term.direction == "vertical" then
-                    return vim.o.columns * 0.4 -- 40% del ancho para la vertical
-                end
-            end,
+            size = 15,
+            direction = 'horizontal',
             close_on_exit = true,
             shell = vim.o.shell,
             start_in_insert = true,
@@ -35,6 +30,13 @@ return {
             noremap = true,
             silent = true,
             desc = "Toggle horizontal terminal"
+        })
+
+        -- Atajo para abrir la terminal 2 en modo horizontal con 2<C-t>
+        vim.keymap.set('n', '2<C-t>', '<cmd>ToggleTerm 2 direction=horizontal<CR>', {
+            noremap = true,
+            silent = true,
+            desc = "Toggle horizontal terminal 2"
         })
 
         -- 2. Atajo para la terminal FLOTANTE (<leader>ft)

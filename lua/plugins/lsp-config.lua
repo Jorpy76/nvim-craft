@@ -1,4 +1,4 @@
--- Asegúrate de que tu archivo comienza con esta línea
+-- Archivo lsp-config.lua compatible con Neovim 0.11+ y nvim-lspconfig v2+/v3
 return {
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -15,42 +15,58 @@ return {
         'L3MON4D3/LuaSnip',
         'rafamadriz/friendly-snippets',
     },
-    -- La función 'config' va DENTRO de la tabla que se retorna
     config = function()
         -- =========================================================================
-        -- INICIO DE LAS CORRECCIONES PARA BORDES Y COLORES
+        -- Flotantes: bordes y colores
         -- =========================================================================
-
-        -- 1. SOLUCIÓN PARA LOS BORDES: Manejador global para ventanas flotantes
         local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
         function vim.lsp.util.open_floating_preview(contents, syntax, opts)
             opts = opts or {}
-            opts.border = opts.border or 'rounded' -- Asegura bordes redondeados
+            opts.border = opts.border or 'rounded'
             return orig_util_open_floating_preview(contents, syntax, opts)
         end
 
-        -- 2. SOLUCIÓN PARA LOS COLORES: Aplicar colores de forma persistente
         local function set_float_highlights()
             vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#2a6f97" })
             vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#18151c" })
         end
-
-        set_float_highlights()                       -- Aplicar al cargar la config
-        vim.api.nvim_create_autocmd('ColorScheme', { -- Re-aplicar si cambia el tema
+        set_float_highlights()
+        vim.api.nvim_create_autocmd('ColorScheme', {
             pattern = '*',
             callback = set_float_highlights
         })
 
         -- =========================================================================
-        -- FIN DE LAS CORRECCIONES
+        -- Diagnósticos
         -- =========================================================================
+        vim.diagnostic.config({
+            virtual_text = true,
+            severity_sort = true,
+            float = {
+                style = 'minimal',
+                border = 'rounded',
+                header = '',
+                prefix = '',
+            },
+            signs = {
+                text = {
+                    [vim.diagnostic.severity.ERROR] = '✘',
+                    [vim.diagnostic.severity.WARN]  = '▲',
+                    [vim.diagnostic.severity.HINT]  = '⚑',
+                    [vim.diagnostic.severity.INFO]  = '»',
+                },
+            },
+        })
 
+        -- =========================================================================
+        -- Autoformat en guardado para filetypes específicos
+        -- =========================================================================
         local autoformat_filetypes = { "lua" }
         vim.api.nvim_create_autocmd('LspAttach', {
             callback = function(args)
                 local client = vim.lsp.get_client_by_id(args.data.client_id)
                 if not client then return end
-                if vim.tbl_contains(autoformat_filetypes, vim.bo.filetype) then
+                if vim.tbl_contains(autoformat_filetypes, vim.bo[args.buf].filetype) then
                     vim.api.nvim_create_autocmd("BufWritePre", {
                         buffer = args.buf,
                         callback = function()
@@ -65,58 +81,90 @@ return {
             end
         })
 
-        vim.diagnostic.config({
-            virtual_text = true,
-            severity_sort = true,
-            float = {
-                style = 'minimal',
-                border = 'rounded',
-                header = '',
-                prefix = '',
-            },
-            signs = {
-                text = {
-                    [vim.diagnostic.severity.ERROR] = '✘',
-                    [vim.diagnostic.severity.WARN] = '▲',
-                    [vim.diagnostic.severity.HINT] = '⚑',
-                    [vim.diagnostic.severity.INFO] = '»',
-                },
-            },
-        })
-
-        local lspconfig_defaults = require('lspconfig').util.default_config
-        lspconfig_defaults.capabilities = vim.tbl_deep_extend(
-            'force',
-            lspconfig_defaults.capabilities,
-            require('cmp_nvim_lsp').default_capabilities()
-        )
-
+        -- =========================================================================
+        -- Keymaps en LspAttach
+        -- =========================================================================
         vim.api.nvim_create_autocmd('LspAttach', {
             callback = function(event)
                 local opts = { buffer = event.buf }
-                vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-                vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-                vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-                vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-                vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
-                vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-                vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
-                vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
-                vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-                vim.keymap.set({ 'n', 'x' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
-                vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+                vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+                vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+                vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+                vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+                vim.keymap.set('n', 'go', vim.lsp.buf.type_definition, opts)
+                vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+                vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, opts)
+                vim.keymap.set('n', 'gl', vim.diagnostic.open_float, opts)
+                vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, opts)
+                vim.keymap.set({ 'n', 'x' }, '<F3>', function() vim.lsp.buf.format({ async = true }) end, opts)
+                vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, opts)
             end,
         })
 
+        -- =========================================================================
+        -- Capabilities para nvim-cmp
+        -- =========================================================================
+        local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+        -- =========================================================================
+        -- mason + mason-lspconfig
+        -- =========================================================================
         require('mason').setup({})
         require('mason-lspconfig').setup({
-            ensure_installed = { "lua_ls", "intelephense", "ts_ls", "eslint", "pylsp" },
+            ensure_installed = { "lua_ls", "intelephense", "ts_ls", "eslint", "tailwindcss" },
+            -- Usamos handlers custom con la API nueva (sin lspconfig.setup)
             handlers = {
+                -- Handler por defecto para servidores comunes
                 function(server_name)
-                    require('lspconfig')[server_name].setup({})
+                    -- Mapa de filetypes por servidor (mínimo necesario para LspStartOnBuf)
+                    local server_filetypes = {
+                        lua_ls       = { "lua" },
+                        pyright      = { "python" },
+                        tsserver     = { "javascript", "javascriptreact", "typescript", "typescriptreact", "tsx", "jsx" },
+                        eslint       = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
+                        intelephense = { "php" },
+                    }
+
+                    local ft = server_filetypes[server_name]
+                    if not ft then
+                        -- Fallback genérico si mason instala un server no mapeado
+                        ft = {}
+                    end
+
+                    local cfg = vim.lsp.config({
+                        name = server_name,
+                        cmd = (function()
+                            -- Deja que lspconfig determine el bin si está disponible sin “framework”
+                            -- o confía en el PATH. Si quieres binarios de mason, puedes apuntar
+                            -- a vim.fn.stdpath("data") .. "/mason/bin/<server>"
+                            return nil
+                        end)(),
+                        filetypes = ft,
+                        capabilities = capabilities,
+                        -- settings vacíos por defecto; servers específicos se sobreescriben abajo
+                        settings = {},
+                    })
+
+                    -- Autostart en buffers con filetype coincidente
+                    vim.api.nvim_create_autocmd("FileType", {
+                        pattern = ft,
+                        callback = function(ev)
+                            -- Evita arrancar duplicado
+                            local bufnr = ev.buf
+                            local active = vim.lsp.get_clients({ name = server_name, bufnr = bufnr })
+                            if active and #active > 0 then return end
+                            vim.lsp.start(cfg, { bufnr = bufnr })
+                        end,
+                    })
                 end,
+
+                -- lua_ls con settings
                 lua_ls = function()
-                    require('lspconfig').lua_ls.setup({
+                    local ft = { "lua" }
+                    local cfg = vim.lsp.config({
+                        name = "lua_ls",
+                        filetypes = ft,
+                        capabilities = capabilities,
                         settings = {
                             Lua = {
                                 runtime = { version = 'LuaJIT' },
@@ -125,28 +173,103 @@ return {
                             },
                         },
                     })
+                    vim.api.nvim_create_autocmd("FileType", {
+                        pattern = ft,
+                        callback = function(ev)
+                            local bufnr = ev.buf
+                            local active = vim.lsp.get_clients({ name = "lua_ls", bufnr = bufnr })
+                            if active and #active > 0 then return end
+                            vim.lsp.start(cfg, { bufnr = bufnr })
+                        end,
+                    })
                 end,
-                pylsp = function()
-                    require('lspconfig').pylsp.setup({
-                        settings = {
-                            pylsp = {
-                                plugins = {
-                                    pyflakes = { enabled = false },
-                                    pycodestyle = { enabled = false },
-                                    autopep8 = { enabled = false },
-                                    yapf = { enabled = false },
-                                    mccabe = { enabled = false },
-                                    pylsp_mypy = { enabled = false },
-                                    pylsp_black = { enabled = false },
-                                    pylsp_isort = { enabled = false },
-                                }
-                            }
-                        },
+
+                -- tsserver (TypeScript/JavaScript)
+                tsserver = function()
+                    local ft = { "javascript", "javascriptreact", "typescript", "typescriptreact", "tsx", "jsx" }
+                    local cfg = vim.lsp.config({
+                        name = "tsserver",
+                        filetypes = ft,
+                        capabilities = capabilities,
+                        settings = {},
+                    })
+                    vim.api.nvim_create_autocmd("FileType", {
+                        pattern = ft,
+                        callback = function(ev)
+                            local bufnr = ev.buf
+                            local active = vim.lsp.get_clients({ name = "tsserver", bufnr = bufnr })
+                            if active and #active > 0 then return end
+                            vim.lsp.start(cfg, { bufnr = bufnr })
+                        end,
+                    })
+                end,
+
+                -- eslint
+                eslint = function()
+                    local ft = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" }
+                    local cfg = vim.lsp.config({
+                        name = "eslint",
+                        filetypes = ft,
+                        capabilities = capabilities,
+                        settings = {},
+                    })
+                    vim.api.nvim_create_autocmd("FileType", {
+                        pattern = ft,
+                        callback = function(ev)
+                            local bufnr = ev.buf
+                            local active = vim.lsp.get_clients({ name = "eslint", bufnr = bufnr })
+                            if active and #active > 0 then return end
+                            vim.lsp.start(cfg, { bufnr = bufnr })
+                        end,
+                    })
+                end,
+
+                -- intelephense
+                intelephense = function()
+                    local ft = { "php" }
+                    local cfg = vim.lsp.config({
+                        name = "intelephense",
+                        filetypes = ft,
+                        capabilities = capabilities,
+                        settings = {},
+                    })
+                    vim.api.nvim_create_autocmd("FileType", {
+                        pattern = ft,
+                        callback = function(ev)
+                            local bufnr = ev.buf
+                            local active = vim.lsp.get_clients({ name = "intelephense", bufnr = bufnr })
+                            if active and #active > 0 then return end
+                            vim.lsp.start(cfg, { bufnr = bufnr })
+                        end,
+                    })
+                end,
+
+                -- tailwindcss
+                tailwindcss = function()
+                    local ft = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte",
+                        "html", "css" }
+                    local cfg = vim.lsp.config({
+                        name = "tailwindcss",
+                        filetypes = ft,
+                        capabilities = capabilities,
+                        settings = {},
+                    })
+                    vim.api.nvim_create_autocmd("FileType", {
+                        pattern = ft,
+                        callback = function(ev)
+                            local bufnr = ev.buf
+                            local active = vim.lsp.get_clients({ name = "tailwindcss", bufnr = bufnr })
+                            if active and #active > 0 then return end
+                            vim.lsp.start(cfg, { bufnr = bufnr })
+                        end,
                     })
                 end,
             },
         })
 
+        -- =========================================================================
+        -- nvim-cmp
+        -- =========================================================================
         local cmp = require('cmp')
         require('luasnip.loaders.from_vscode').lazy_load()
         vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
@@ -175,13 +298,13 @@ return {
                 end,
             },
             mapping = cmp.mapping.preset.insert({
-                ['<CR>'] = cmp.mapping.confirm({ select = false }),
-                ['<C-f>'] = cmp.mapping.scroll_docs(5),
-                ['<C-u>'] = cmp.mapping.scroll_docs(-5),
-                ['<C-e>'] = cmp.mapping(function(fallback)
+                ['<CR>']    = cmp.mapping.confirm({ select = false }),
+                ['<C-f>']   = cmp.mapping.scroll_docs(5),
+                ['<C-u>']   = cmp.mapping.scroll_docs(-5),
+                ['<C-e>']   = cmp.mapping(function()
                     if cmp.visible() then cmp.abort() else cmp.complete() end
                 end),
-                ['<Tab>'] = cmp.mapping(function(fallback)
+                ['<Tab>']   = cmp.mapping(function(fallback)
                     local col = vim.fn.col('.') - 1
                     if cmp.visible() then
                         cmp.select_next_item({ behavior = 'select' })
@@ -192,15 +315,15 @@ return {
                     end
                 end, { 'i', 's' }),
                 ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = 'select' }),
-                ['<C-d>'] = cmp.mapping(function(fallback)
+                ['<C-d>']   = cmp.mapping(function(fallback)
                     local luasnip = require('luasnip')
                     if luasnip.jumpable(1) then luasnip.jump(1) else fallback() end
                 end, { 'i', 's' }),
-                ['<C-b>'] = cmp.mapping(function(fallback)
+                ['<C-b>']   = cmp.mapping(function(fallback)
                     local luasnip = require('luasnip')
                     if luasnip.jumpable(-1) then luasnip.jump(-1) else fallback() end
                 end, { 'i', 's' }),
             }),
         })
     end,
-} -- Y asegúrate de que termina con esta llave
+}

@@ -26,12 +26,6 @@ vim.keymap.set("n", "<C-s>", ":wa<CR>", { noremap = true, silent = true })
 vim.keymap.set("i", "<C-s>", "<Esc>:wa<CR>i", { noremap = true, silent = true })
 
 
--- Navigate vim panes better
-vim.keymap.set("n", "<c-k>", ":wincmd k<CR>")
-vim.keymap.set("n", "<c-j>", ":wincmd j<CR>")
-vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
-vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
-
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>")
 vim.wo.number = true
 
@@ -65,3 +59,10 @@ end, { noremap = true, silent = true })
 --Zen-mode
 vim.keymap.set('n', '<leader>z', ':ZenMode<CR>', { noremap = true, silent = true })
 --Rest
+--
+
+-- Keymaps: Ctrl + h/j/k/l
+vim.keymap.set("n", "<C-h>", function() smart_navigator("h") end, { desc = "Smart move left (nvim/zellij)" })
+vim.keymap.set("n", "<C-j>", function() smart_navigator("j") end, { desc = "Smart move down (nvim/zellij)" })
+vim.keymap.set("n", "<C-k>", function() smart_navigator("k") end, { desc = "Smart move up (nvim/zellij)" })
+vim.keymap.set("n", "<C-l>", function() smart_navigator("l") end, { desc = "Smart move right (nvim/zellij)" })
