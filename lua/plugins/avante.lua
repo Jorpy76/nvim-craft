@@ -11,43 +11,86 @@ return {
     version = false,
 
     opts = {
-        provider = "gemini",
+        -- 🔵 Provider por defecto (rápido)
+        provider = "copilot_mini",
+        auto_suggestions_provider = "copilot_mini",
+
+        -- 🔵 Definición de providers (nuevo esquema, sin vendors)
         providers = {
+            -- Base de Copilot (se hereda desde aquí)
+            copilot = {
+                endpoint = "https://api.githubcopilot.com",
+                model = "gpt-4.1-mini", -- valor por defecto si usas "copilot" directo
+                timeout = 30000,
+                -- aquí irían cosas comunes si Avante las usa para Copilot,
+                -- pero normalmente no hace falta más
+            },
+
+            -- RÁPIDO: GPT‑4.1-mini
+            copilot_mini = {
+                __inherited_from = "copilot",
+                model = "gpt-4.1-mini",
+                timeout = 30000,
+                extra_request_body = {
+                    temperature = 0.2,
+                    max_completion_tokens = 4096,
+                },
+            },
+
+            -- POTENTE: Claude 3.5 Sonnet
+            copilot_claude = {
+                __inherited_from = "copilot",
+                model = "claude-3.5-sonnet",
+                timeout = 30000,
+                extra_request_body = {
+                    temperature = 0.3,
+                    max_completion_tokens = 8192,
+                },
+            },
+
+            -- INTERMEDIO: GPT‑4.1
+            copilot_gpt4 = {
+                __inherited_from = "copilot",
+                model = "gpt-4.1",
+                timeout = 30000,
+                extra_request_body = {
+                    temperature = 0.2,
+                    max_completion_tokens = 8192,
+                },
+            },
+
+            -- Mantener Gemini por si acaso (opcional)
             gemini = {
                 endpoint = "https://generativelanguage.googleapis.com/v1beta",
                 model = "models/gemini-2.5-flash",
                 timeout = 30000,
                 extra_request_body = {
                     temperature = 0.7,
-                    max_output_tokens = 2048, -- nombre correcto del parámetro
+                    max_output_tokens = 2048,
                 },
             },
         },
-
-        -- 👇 sección nueva de UI
+        -- 👇 tu sección de UI tal cual
         input = {
             provider = "snacks",
             provider_opts = {
-                -- configuraciones del cuadro de entrada (AvanteInput)
-                height = 10, -- aumenta a 10 líneas el área de escritura
+                height = 10,
                 border = "rounded",
                 win_options = {
                     winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
-                    wrap = true,      -- permite que el texto salte de línea
-                    linebreak = true, -- evita cortarlo a mitad de palabra
-                    scrolloff = 1,    -- agrega margen arriba/abajo
+                    wrap = true,
+                    linebreak = true,
+                    scrolloff = 1,
                 },
-                -- a veces el contador de tokens se superpone: agregamos padding inferior
                 style = {
                     padding_bottom = 1,
                 },
             },
         },
         ui = {
-            -- configuraciones del panel lateral
             panel = {
-                width = 0.35,   -- 35% de la pantalla
-                min_width = 60, -- mínimo 60 columnas para comodidad
+                width = 0.35,
+                min_width = 60,
                 border = "rounded",
             },
         },
@@ -63,8 +106,9 @@ return {
         "stevearc/dressing.nvim",
         "folke/snacks.nvim",
         "nvim-tree/nvim-web-devicons",
+        "zbirenbaum/copilot.lua", -- 🔵 importante para Copilot
 
-        { -- imágenes en prompts
+        {
             "HakonHarnes/img-clip.nvim",
             event = "VeryLazy",
             opts = {
@@ -77,7 +121,7 @@ return {
             },
         },
 
-        { -- render markdown bonito en el panel de Avante
+        {
             "MeanderingProgrammer/render-markdown.nvim",
             opts = { file_types = { "markdown", "Avante" } },
             ft = { "markdown", "Avante" },

@@ -35,6 +35,7 @@ return {
         dependencies = {
             "luckasRanarison/tailwind-tools.nvim",
             "onsails/lspkind-nvim",
+            "hrsh7th/cmp-emoji",
         },
         config = function()
             local cmp = require("cmp")
@@ -82,6 +83,7 @@ return {
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
                     { name = "luasnip" },
+                    { name = "emoji" },
                 }, {
                     { name = "buffer" },
                 }),
