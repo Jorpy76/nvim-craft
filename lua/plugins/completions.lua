@@ -10,7 +10,7 @@ return {
         },
         config = function()
             local ls = require("luasnip")
-            require("luasnip.loaders.from_vscode").lazy_load({ paths = { "/home/jorgeriosf/.config/craft/snippets" } })
+            require("luasnip.loaders.from_vscode").lazy_load({ paths = { "/home/jorgerios/.config/nvim/snippets" } })
 
             -- Extiende filetypes si es necesario
             ls.filetype_extend("javascriptreact", { "html" })
@@ -81,8 +81,10 @@ return {
                     end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
-                    { name = "nvim_lsp" },
-                    { name = "luasnip" },
+                    { name = "luasnip",      priority = 1000 },
+                    { name = "obsidian",     priority = 750 },
+                    { name = "obsidian_new", priority = 500 },
+                    { name = "nvim_lsp",     priority = 250 },
                     { name = "emoji" },
                 }, {
                     { name = "buffer" },

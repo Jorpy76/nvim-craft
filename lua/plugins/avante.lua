@@ -11,66 +11,14 @@ return {
     version = false,
 
     opts = {
-        -- 🔵 Provider por defecto (rápido)
-        provider = "copilot_mini",
-        auto_suggestions_provider = "copilot_mini",
+        -- 🔵 Provider correcto: "copilot" (no "copilot_mini")
+        provider = "copilot",
+        auto_suggestions_provider = "copilot",
 
-        -- 🔵 Definición de providers (nuevo esquema, sin vendors)
-        providers = {
-            -- Base de Copilot (se hereda desde aquí)
-            copilot = {
-                endpoint = "https://api.githubcopilot.com",
-                model = "gpt-4.1-mini", -- valor por defecto si usas "copilot" directo
-                timeout = 30000,
-                -- aquí irían cosas comunes si Avante las usa para Copilot,
-                -- pero normalmente no hace falta más
-            },
+        -- 🔵 NO definas providers personalizados para Copilot
+        -- Avante usa directamente copilot.lua que ya tienes configurado
 
-            -- RÁPIDO: GPT‑4.1-mini
-            copilot_mini = {
-                __inherited_from = "copilot",
-                model = "gpt-4.1-mini",
-                timeout = 30000,
-                extra_request_body = {
-                    temperature = 0.2,
-                    max_completion_tokens = 4096,
-                },
-            },
-
-            -- POTENTE: Claude 3.5 Sonnet
-            copilot_claude = {
-                __inherited_from = "copilot",
-                model = "claude-3.5-sonnet",
-                timeout = 30000,
-                extra_request_body = {
-                    temperature = 0.3,
-                    max_completion_tokens = 8192,
-                },
-            },
-
-            -- INTERMEDIO: GPT‑4.1
-            copilot_gpt4 = {
-                __inherited_from = "copilot",
-                model = "gpt-4.1",
-                timeout = 30000,
-                extra_request_body = {
-                    temperature = 0.2,
-                    max_completion_tokens = 8192,
-                },
-            },
-
-            -- Mantener Gemini por si acaso (opcional)
-            gemini = {
-                endpoint = "https://generativelanguage.googleapis.com/v1beta",
-                model = "models/gemini-2.5-flash",
-                timeout = 30000,
-                extra_request_body = {
-                    temperature = 0.7,
-                    max_output_tokens = 2048,
-                },
-            },
-        },
-        -- 👇 tu sección de UI tal cual
+        -- Tu UI igual que antes
         input = {
             provider = "snacks",
             provider_opts = {
@@ -106,7 +54,9 @@ return {
         "stevearc/dressing.nvim",
         "folke/snacks.nvim",
         "nvim-tree/nvim-web-devicons",
-        "zbirenbaum/copilot.lua", -- 🔵 importante para Copilot
+
+        -- 🔵 Importante: Avante necesita copilot.lua para el provider "copilot"
+        "zbirenbaum/copilot.lua",
 
         {
             "HakonHarnes/img-clip.nvim",
@@ -120,7 +70,6 @@ return {
                 },
             },
         },
-
         {
             "MeanderingProgrammer/render-markdown.nvim",
             opts = { file_types = { "markdown", "Avante" } },

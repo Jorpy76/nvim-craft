@@ -1,0 +1,124 @@
+{
+  "Callout Info": {
+    "prefix": "cinfo",
+    "body": ["> [!INFO] ${1:Título}", "> ${0:Contenido}"],
+    "description": "Callout informativo azul"
+  },
+  "Callout Warning": {
+    "prefix": "cwarn",
+    "body": ["> [!WARNING] ${1:Cuidado}", "> ${0:Contenido}"],
+    "description": "Callout de advertencia amarillo"
+  },
+  "Callout Danger": {
+    "prefix": "cdang",
+    "body": ["> [!DANGER] ${1:Peligro}", "> ${0:Contenido}"],
+    "description": "Callout de peligro rojo"
+  },
+  "Callout Todo": {
+    "prefix": "ctodo",
+    "body": ["> [!TODO] ${1:Por hacer}", "> ${0:Contenido}"],
+    "description": "Callout de lista de tareas"
+  },
+  "Bold Text": {
+    "prefix": "bb",
+    "body": "**${1:texto}**$0",
+    "description": "Formato negrita"
+  },
+  "Callout Dinámico": {
+    "prefix": "call",
+    "body": [
+      "> [!${1|INFO,TODO,WARNING,DANGER,ERROR,HINT,NOTE|}] ${2:Título}",
+      "> ${0:Contenido}"
+    ],
+    "description": "Insertar Callout con selector de tipo"
+  }
+    "CTF Target Header": {
+    "prefix": "target",
+    "body": [
+      "## Información del Objetivo",
+      "",
+      "- **IP:** `${1:10.10.11.X}`",
+      "- **OS:** ${2|Linux,Windows|}",
+      "- **Dificultad:** ${3|Easy,Medium,Hard,Insane|}",
+      "- **Nombre:** **${4:MachineName}**",
+      "",
+      "---",
+      "$0"
+    ],
+    "description": "Cabecera rápida para iniciar una máquina"
+  },
+  "HTB Flag": {
+    "prefix": "flag",
+    "body": [
+      "> [!SUCCESS] Flag Capturada (${1|User,Root|})",
+      "> `HTB{${2:hash_aqui}}`$0"
+    ],
+    "description": "Callout verde para resaltar la flag"
+  },
+  "Credentials Box": {
+    "prefix": "creds",
+    "body": [
+      "| Usuario | Contraseña | Servicio | Hash |",
+      "| :--- | :--- | :--- | :--- |",
+      "| `${1:admin}` | `${2:password}` | ${3:SSH/RDP} | ${4:N/A} |",
+      "$0"
+    ],
+    "description": "Tabla rápida para guardar credenciales encontradas"
+  }
+  "Bash Block": {
+    "prefix": "bash",
+    "body": [
+      "```bash",
+      "${1:comando}",
+      "```",
+      "$0"
+    ],
+    "description": "Bloque de código Bash"
+  },
+  "Python Block": {
+    "prefix": "py",
+    "body": [
+      "```python",
+      "${0}",
+      "```"
+    ],
+    "description": "Bloque de código Python"
+  },
+  "Nmap Output": {
+    "prefix": "nmap",
+    "body": [
+      "> [!EXAMPLE]- Resultado Nmap",
+      "> ```bash",
+      "> ${0:Pegar output aquí}",
+      "> ```"
+    ],
+    "description": "Callout colapsable (-) para no llenar la nota con logs largos"
+  }
+  "Frontmatter Note": {
+    "prefix": "fm",
+    "body": [
+      "---",
+      "id: ${1:nombre_nota}",
+      "tags:",
+      "  - ${2|cpent,linux,windows,web,networking|}",
+      "date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+      "---",
+      "",
+      "# $1",
+      "$0"
+    ],
+    "description": "Insertar metadatos YAML al inicio"
+  },
+  "Collapsible Section": {
+    "prefix": "fold",
+    "body": [
+      "<details>",
+      "<summary>${1:Título del spoiler}</summary>",
+      "",
+      "${0:Contenido oculto}",
+      "",
+      "</details>"
+    ],
+    "description": "Crear una sección desplegable HTML nativa"
+  }
+}

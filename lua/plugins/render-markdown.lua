@@ -1,12 +1,19 @@
- return {
-
- }
--- {
---     'MeanderingProgrammer/render-markdown.nvim',
---     --dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
---     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
---     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
---     ---@module 'render-markdown'
---     ---@type render.md.UserConfig
---     opts = {},
--- }
+return {
+    "MeanderingProgrammer/render-markdown.nvim",
+    opts = {
+        code = {
+            enabled = true,
+            sign = true,    -- Muestra el icono del lenguaje
+            style = 'full', -- 'full' pone fondo al bloque completo
+            width = 'block',
+            left_pad = 2,   -- Añade padding a la izquierda como Obsidian
+        },
+        heading = {
+            sign = false, -- Opcional: oculta los signos #
+            icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " }, -- Iconos para H1-H6
+        },
+        file_types = { "markdown", "Avante" },
+        render_modes = { "n", "c", "i" },
+    },
+    ft = { "markdown", "Avante" }, -- Soporte para tipos de archivo
+}

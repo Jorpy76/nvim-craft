@@ -1,18 +1,29 @@
 {
-    "name": "jorge-snippets",
+  "name": "jorge-snippets",
   "engines": {
-        "vscode": "^1.11.0"
-    },
-    "contributes": {
-        "snippets": [
-            {
-                "language": [ "typescriptreact", "typescript.tsx"],
-                "path": "./qwik.json"
-            },
-            {
-                "language": [ "lua"],
-                "path": "./simple.json"
-            }
-        ]
-    }
+    "vscode": "^1.11.0"
+  },
+  "contributes": {
+    "snippets": [
+      {
+        "language": [
+          "typescriptreact",
+          "typescript.tsx"
+        ],
+        "path": "./qwik.json"
+      },
+      {
+        "language": [
+          "lua"
+        ],
+        "path": "./simple.json"
+      },
+      {
+        "language": [
+          "markdown"
+        ],
+        "path": "./obsidian.json"
+      }
+    ]
+  }
 }

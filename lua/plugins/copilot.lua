@@ -9,9 +9,9 @@ return {
                     enabled = true,
                     auto_trigger = true,
                     keymap = {
-                        accept = "<M-l>",
-                        next = "<M-]>",
-                        prev = "<M-[>",
+                        accept = "<c-y>",
+                        next = "<M-.>",
+                        prev = "<M-,>",
                         dismiss = "<C-]>",
                     },
                 },
