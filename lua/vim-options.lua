@@ -65,6 +65,9 @@ vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = "Mover a la ventana de abajo" })
 vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = "Mover a la ventana de arriba" })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = "Mover a la ventana derecha" })
 
+-- Ver todos los tags del vault en un picker
+vim.keymap.set("n", "<leader>ot", ":Obsidian tags<CR>", { desc = "Obsidian: Ver todos los tags" })
+
 -------------------------------------------------------------------------------
 -- CONFIGURACIONES ESPECÍFICAS DE LENGUAJE (Autocmds)
 -------------------------------------------------------------------------------

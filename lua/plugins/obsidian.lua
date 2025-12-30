@@ -1,20 +1,23 @@
 return {
-    "epwalsh/obsidian.nvim",
+    "obsidian-nvim/obsidian.nvim",
     version = "*",
     lazy = true,
     ft = "markdown",
     dependencies = {
         "nvim-lua/plenary.nvim",
+        "hrsh7th/nvim-cmp",
+        "nvim-treesitter/nvim-treesitter",
+        "folke/snacks.nvim",
     },
     opts = {
+        legacy_commands = false,
         workspaces = {
             {
                 name = "obsidian_vault",
                 path = "/home/jorgerios/obsidian-vault",
             },
         },
-
-        img_folder = "HELPERS/Images",
+        img_folder = "HELPERS/Images", -- Carpeta destino de tus imágenes
 
         templates = {
             subdir = "Templates",
@@ -22,71 +25,89 @@ return {
             time_format = "%H:%M",
         },
 
-        mappings = {
-            -- AQUI EMPIEZA LA CORRECCIÓN DE SINTAXIS
-            ["<leader>p"] = {
-                action = function()
-                    -- 1. Pedir nombre
+        callbacks = {
+            enter_note = function(client, note)
+                -- 1. Smart Action (<CR>)
+                vim.keymap.set("n", "<cr>", function()
+                    require("obsidian").util.smart_action()
+                end, { buffer = true, desc = "Obsidian Smart Action" })
+
+                -- 2. SCRIPT DE IMÁGENES (Con cálculo de ruta INFALIBLE)
+                vim.keymap.set("n", "<leader>p", function()
                     local name = vim.fn.input("Nombre imagen (webp): ")
                     if name == "" then return end
 
-                    -- 2. Rutas Maestras
-                    local vault_root = "/home/jorgerios/obsidian-vault/"
-                    local img_rel_path = "HELPERS/Images/" 
-                    local img_abs_dir = vault_root .. img_rel_path
-                    
-                    -- Sanitizar nombre
-                    local safe_name = name:gsub(" ", "_")
-                    local png_tmp = img_abs_dir .. safe_name .. ".png"
-                    local webp_final = img_abs_dir .. safe_name .. ".webp"
+                    -- A. Definir rutas absolutas
+                    local vault_root = "/home/jorgerios/obsidian-vault" -- Sin slash final para evitar líos
+                    local img_rel_dir = "HELPERS/Images"
+                    local img_dir = vault_root .. "/" .. img_rel_dir
 
-                    -- 3. Crear Imagen (xclip -> cwebp)
+                    local safe_name = name:gsub(" ", "_")
+                    local png_tmp = img_dir .. "/" .. safe_name .. ".png"
+                    local webp_final = img_dir .. "/" .. safe_name .. ".webp"
+
+                    -- B. Guardar imagen (xclip -> cwebp)
                     local cmd = string.format(
                         "xclip -selection clipboard -t image/png -o > %q && cwebp -q 80 %q -o %q && rm %q",
                         png_tmp, png_tmp, webp_final, png_tmp
                     )
-                    
+
                     print(" Procesando imagen...")
                     vim.fn.system(cmd)
 
-                    -- 4. Verificar creación
                     if vim.fn.filereadable(webp_final) == 0 then
-                        print(" Error: No se generó el archivo. Revisa el portapapeles.")
+                        print(" Error: No se pudo guardar la imagen (revisa xclip/cwebp).")
                         return
                     end
 
-                    -- 5. CÁLCULO MATEMÁTICO DE RUTA (Sin librerías externas)
-                    local current_file = vim.fn.expand("%:p") or ""
-                    
-                    -- Verificamos si estamos dentro del Vault
-                    if current_file == "" or string.find(current_file, vault_root, 1, true) == nil then
-                        print(" ! Aviso: Nota fuera del Vault. Usando enlace simple.")
-                        local link = string.format("![[%s%s.webp]]", img_rel_path, safe_name)
-                        vim.api.nvim_put({ link }, "c", true, true)
-                        return
-                    end
-                    
-                    -- Magia matemática: Restamos la raíz y contamos profundidad
-                    local internal_path = current_file:sub(#vault_root + 1)
-                    local depth = select(2, internal_path:gsub("/", ""))
-                    local back_path = string.rep("../", depth)
-                    
-                    -- Construye la ruta relativa final
-                    local relative_path = back_path .. img_rel_path .. safe_name .. ".webp"
+                    -- C. CÁLCULO DE RUTA RELATIVA ROBUSTO (Sin adivinanzas)
+                    -- Obtener el directorio donde está la nota que editas
+                    local current_dir = vim.fn.expand("%:p:h")
 
-                    -- 6. Insertar enlace
+                    -- Función local para calcular ruta relativa de A -> B
+                    local function get_relative_path(start_path, end_path)
+                        -- Normalizar slashes
+                        local s = start_path:gsub("/+", "/")
+                        local e = end_path:gsub("/+", "/")
+
+                        -- Dividir en partes
+                        local s_parts = vim.split(s, "/")
+                        local e_parts = vim.split(e, "/")
+
+                        -- Encontrar prefijo común
+                        local i = 1
+                        while s_parts[i] and e_parts[i] and s_parts[i] == e_parts[i] do
+                            i = i + 1
+                        end
+
+                        -- Construir los "../" necesarios
+                        local rel = {}
+                        for j = i, #s_parts do
+                            if s_parts[j] ~= "" then table.insert(rel, "..") end
+                        end
+
+                        -- Agregar la parte restante del destino
+                        for j = i, #e_parts do
+                            if e_parts[j] ~= "" then table.insert(rel, e_parts[j]) end
+                        end
+
+                        return table.concat(rel, "/")
+                    end
+
+                    -- Generar ruta exacta desde TU nota hasta LA imagen
+                    local relative_path = get_relative_path(current_dir, webp_final)
+
+                    -- D. Insertar enlace y refrescar
                     local link = string.format("![](%s)", relative_path)
                     vim.api.nvim_put({ link }, "c", true, true)
-                    
-                    -- 7. Refresco
-                    vim.defer_fn(function() 
-                        vim.cmd("checktime") 
-                        pcall(function() require("image").refresh() end)
-                        print("✓ Imagen lista: " .. relative_path)
-                    end, 200)
-                end,
-                opts = { buffer = true },
-            }, -- <--- AQUÍ SE CIERRA CORRECTAMENTE EL MAPPING
+
+                    vim.schedule(function()
+                        -- Forzamos un pequeño "toque" para que Snacks despierte
+                        vim.cmd("checktime")
+                        print("✓ Imagen: " .. safe_name .. " (Ruta: " .. relative_path .. ")")
+                    end)
+                end, { buffer = true, desc = "Pegar imagen WebP" })
+            end,
         },
     },
 }

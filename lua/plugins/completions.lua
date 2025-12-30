@@ -81,18 +81,33 @@ return {
                     end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
-                    { name = "luasnip",      priority = 1000 },
-                    { name = "obsidian",     priority = 750 },
-                    { name = "obsidian_new", priority = 500 },
-                    { name = "nvim_lsp",     priority = 250 },
-                    { name = "emoji" },
+                    -- { name = "luasnip",       priority = 1000 },
+                    -- { name = "obsidian",      priority = 900 },
+                    -- { name = "obsidian_new",  priority = 800 },
+                    -- { name = "obsidian_tags", priority = 700 },
+                    -- { name = "nvim_lsp",      priority = 250 },
+                    -- { name = "emoji" },
+                    { name = "obsidian",      priority = 1000 }, -- notas existentes
+                    { name = "obsidian_new",  priority = 900 }, -- crear nuevas notas
+                    { name = "obsidian_tags", priority = 800 }, -- tags
+
+                    -- 🔹 Luego el resto
+                    { name = "luasnip",       priority = 700 },
+                    { name = "nvim_lsp",      priority = 500 },
+                    { name = "emoji",         priority = 250 },
                 }, {
-                    { name = "buffer" },
+                    { name = "buffer", priority = 100 },
                 }),
                 formatting = {
                     format = lspkind.cmp_format({
                         before = tailwind_tools.lspkind_format,
                     }),
+                },
+                completion = {
+                    autocomplete = {
+                        require("cmp.types").cmp.TriggerEvent.TextChanged,
+                    },
+                    keyword_length = 0, -- Activa desde el primer carácter
                 },
             })
         end,
