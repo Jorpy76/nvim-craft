@@ -10,7 +10,9 @@ return {
         },
         config = function()
             local ls = require("luasnip")
-            require("luasnip.loaders.from_vscode").lazy_load({ paths = { "/home/jorgerios/.config/nvim/snippets" } })
+            local mis_snippets = vim.fn.stdpath("config") .. "/snippets"
+            require("luasnip.loaders.from_vscode").lazy_load({ paths = { mis_snippets } })
+            require("luasnip.loaders.from_lua").lazy_load({ paths = { mis_snippets } })
 
             -- Extiende filetypes si es necesario
             ls.filetype_extend("javascriptreact", { "html" })
@@ -36,6 +38,7 @@ return {
             "luckasRanarison/tailwind-tools.nvim",
             "onsails/lspkind-nvim",
             "hrsh7th/cmp-emoji",
+            "f3fora/cmp-spell",
         },
         config = function()
             local cmp = require("cmp")
@@ -81,27 +84,51 @@ return {
                     end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
-                    -- { name = "luasnip",       priority = 1000 },
-                    -- { name = "obsidian",      priority = 900 },
-                    -- { name = "obsidian_new",  priority = 800 },
-                    -- { name = "obsidian_tags", priority = 700 },
-                    -- { name = "nvim_lsp",      priority = 250 },
-                    -- { name = "emoji" },
                     { name = "obsidian",      priority = 1000 }, -- notas existentes
-                    { name = "obsidian_new",  priority = 900 }, -- crear nuevas notas
-                    { name = "obsidian_tags", priority = 800 }, -- tags
+                    { name = "obsidian_new",  priority = 900 },  -- crear nuevas notas
+                    { name = "obsidian_tags", priority = 800 },  -- tags
 
                     -- 🔹 Luego el resto
                     { name = "luasnip",       priority = 700 },
                     { name = "nvim_lsp",      priority = 500 },
+                    { name = "spell",         priority = 400 },
                     { name = "emoji",         priority = 250 },
                 }, {
                     { name = "buffer", priority = 100 },
                 }),
                 formatting = {
                     format = lspkind.cmp_format({
-                        before = tailwind_tools.lspkind_format,
+                        mode = 'symbol_text', -- Muestra Icono + Texto
+                        maxwidth = 50,        -- Evita que el menú se ensanche demasiado
+                        ellipsis_char = '...',
+                        before = function(entry, vim_item)
+                            -- 1. Mantenemos el formato de Tailwind (colores de clases)
+                            vim_item = tailwind_tools.lspkind_format(entry, vim_item)
+
+                            -- 2. Definimos iconos y etiquetas sobrias para tus fuentes
+                            local menu_icon = {
+                                obsidian      = "󰎚 [Nota]",
+                                obsidian_new  = "󰎚  [Nueva]",
+                                obsidian_tags = "󰓹 [Tag]",
+                                spell         = "󰓆 [Esp]",
+                                nvim_lsp      = " [LSP]",
+                                luasnip       = "󰩫 [Snip]",
+                                buffer        = "󰽙 [Buf]",
+                                emoji         = "󰞅 [Emo]",
+                            }
+
+                            -- 3. Aplicamos la etiqueta al menú (lado derecho)
+                            vim_item.menu = menu_icon[entry.source.name] or string.format("[%s]", entry.source.name)
+
+                            return vim_item
+                        end,
                     }),
+                },
+                completion = {
+                    autocomplete = {
+                        require("cmp.types").cmp.TriggerEvent.TextChanged,
+                    },
+                    keyword_length = 0, -- Sigue activo desde el primer carácter para fluidez total
                 },
                 completion = {
                     autocomplete = {

@@ -3,87 +3,89 @@ return {
     priority = 1000,
     lazy = false,
     opts = {
-        -- 1. picker
+        -- 1. PICKER: Configurado para insertar nombres de archivos limpios
         picker = {
-            enabled = true
+            enabled = true,
+            win = {
+                input = {
+                    keys = {
+                        -- Control + g para confirmar y pegar
+                        ["<C-g>"] = { "confirm_path", mode = { "n", "i" } },
+                    },
+                },
+            },
+            actions = {
+                confirm_path = function(picker)
+                    local item = picker:current()
+                    if not item then return end
+                    picker:close()
+
+                    -- Extraemos solo el nombre del archivo (ej: Hackthebox-cube.png)
+                    -- Esto permite que la API de Obsidian lo encuentre solo
+                    local filename = vim.fs.basename(item.file)
+                    local link = string.format("![%s](%s)", filename, filename)
+
+                    vim.schedule(function()
+                        -- Inserta el formato Markdown completo
+                        vim.api.nvim_put({ link }, "c", false, true)
+                        vim.cmd("startinsert")
+                    end)
+                end,
+            },
         },
 
-        -- 2. imágenes
+        -- 2. IMÁGENES: Resolución nativa mediante la API del Fork
         image = {
             enabled = true,
-            formats = {
-                "png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff",
-                "heic", "avif", "mp4", "mov", "avi", "mkv", "webm", "pdf",
-            },
+            formats = { "png", "jpg", "jpeg", "gif", "bmp", "webp", "pdf" },
+            resolve = function(path, src)
+                local ok, api = pcall(require, "obsidian.api")
+                if ok and api.path_is_note(path) then
+                    -- La API busca el 'src' automáticamente en tu carpeta de adjuntos
+                    return api.resolve_attachment_path(src)
+                end
+            end,
             doc = {
                 enabled = true,
                 inline = true,
-                float = true,
+                float = false,
                 max_width = 80,
                 max_height = 40,
             },
             wo = {
                 wrap = false,
-                number = false,
-                relativenumber = false,
-                cursorcolumn = false,
                 signcolumn = "no",
-                foldcolumn = "0",
-                list = false,
-                spell = false,
                 statuscolumn = "",
             },
         },
 
-        -- 3. indentación
+        -- 3. INDENTACIÓN
         indent = {
             enabled = true,
             char = "│",
-            priority = 1,
-            only_scope = false,
-            only_current = false,
-            hl = "SnacksIndent",
-
-            scope = {
-                enabled = true,
-                priority = 200,
-                char = "│",
-                underline = false,
-                only_current = false,
-                hl = "SnacksIndentScope",
-            },
-
+            scope = { enabled = true, char = "│", hl = "SnacksIndentScope" },
             animate = {
                 enabled = vim.fn.has("nvim-0.10") == 1,
                 style = "out",
-                easing = "linear",
-                duration = {
-                    step = 20,
-                    total = 500,
-                },
-            },
-
-            chunk = {
-                enabled = false,
-                only_current = false,
-                priority = 200,
-                hl = "SnacksIndentChunk",
-                char = {
-                    corner_top = "┌",
-                    corner_bottom = "└",
-                    horizontal = "─",
-                    vertical = "│",
-                    arrow = ">",
-                },
+                duration = { step = 20, total = 500 },
             },
         },
     },
+
+    -- 4. ATAJOS DE TECLADO
     keys = {
-        -- Buscar archivos (Space + f + f)
         { "<leader>ff", function() Snacks.picker.files() end, desc = "Buscar Archivos" },
-        -- Buscar texto en todo el proyecto (Space + f + g)
         { "<leader>fg", function() Snacks.picker.grep() end,  desc = "Grep Texto" },
-        -- Buscar Iconos / Emojis (Space + f + i)
         { "<leader>fi", function() Snacks.picker.icons() end, desc = "Buscar Iconos" },
+        {
+            "<leader>fp",
+            function()
+                Snacks.picker.files({
+                    cwd = "/home/jorgerios/obsidian-vault/HELPERS/Images",
+                    desc = "Imágenes Obsidian",
+                })
+            end,
+            desc = "Picker de Imágenes"
+        },
     },
 }

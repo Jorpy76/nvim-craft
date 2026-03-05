@@ -31,8 +31,8 @@
       "> ${0:Contenido}"
     ],
     "description": "Insertar Callout con selector de tipo"
-  }
-    "CTF Target Header": {
+  },
+  "CTF Target Header": {
     "prefix": "target",
     "body": [
       "## Información del Objetivo",
@@ -64,24 +64,26 @@
       "$0"
     ],
     "description": "Tabla rápida para guardar credenciales encontradas"
-  }
-  "Bash Block": {
-    "prefix": "bash",
+  },
+  "PtH Evidence Box": {
+    "prefix": "creds-pth",
     "body": [
-      "```bash",
-      "${1:comando}",
-      "```",
+      "| Host | Usuario | Hash NTLM | Técnica | Estado |",
+      "| :--- | :--- | :--- | :--- | :--- |",
+      "| ${1:MS01 (10.129.201.126)} | ${2:Administrator (RID-500)} | `${3:30B3783CE2ABF1AF70F77D0660CF3453}` | ${4:Pass the Hash (PtH)} | **${5:Pwn3d! (Acceso Administrativo)}** |",
+      "",
       "$0"
     ],
+    "description": "Tabla detallada para hallazgos de Pass the Hash"
+  },
+  "Bash Block": {
+    "prefix": "shell",
+    "body": ["```shell", "${1:comando}", "```", "$0"],
     "description": "Bloque de código Bash"
   },
   "Python Block": {
     "prefix": "py",
-    "body": [
-      "```python",
-      "${0}",
-      "```"
-    ],
+    "body": ["```python", "${0}", "```"],
     "description": "Bloque de código Python"
   },
   "Nmap Output": {
@@ -93,7 +95,7 @@
       "> ```"
     ],
     "description": "Callout colapsable (-) para no llenar la nota con logs largos"
-  }
+  },
   "Frontmatter Note": {
     "prefix": "fm",
     "body": [
@@ -120,5 +122,55 @@
       "</details>"
     ],
     "description": "Crear una sección desplegable HTML nativa"
+  },
+  "Bold (Negrita)": {
+    "prefix": "b",
+    "body": "**$1**$0",
+    "description": "Texto en negrita con cursor al medio"
+  },
+  "Italic (Cursiva)": {
+    "prefix": "i",
+    "body": "*$1*$0",
+    "description": "Texto en cursiva con cursor al medio"
+  },
+  "Strike (Tachado)": {
+    "prefix": "s",
+    "body": "~~$1~~$0",
+    "description": "Texto tachado"
+  },
+  "Highlight (Resaltado Obsidian)": {
+    "prefix": "h",
+    "body": "==$1==$0",
+    "description": "Texto resaltado (estilo marcador)"
+  },
+  "Inline Code (Código en línea)": {
+    "prefix": "c",
+    "body": "`$1`$0",
+    "description": "Código en línea (backticks)"
+  },
+  "Link (Enlace)": {
+    "prefix": "link",
+    "body": "[${1:texto}](${2:url})$0",
+    "description": "Insertar enlace Markdown"
+  },
+  "Image (Imagen)": {
+    "prefix": "img",
+    "body": "![${1:alt}](${2:ruta})$0",
+    "description": "Insertar imagen Markdown"
+  },
+  "Task (Tarea)": {
+    "prefix": "todo",
+    "body": "- [ ] $1",
+    "description": "Checkbox de tarea vacía"
+  },
+  "Task Done (Tarea lista)": {
+    "prefix": "done",
+    "body": "- [x] $1",
+    "description": "Checkbox de tarea completada"
+  },
+  "Horizontal Rule (Separador)": {
+    "prefix": "sep",
+    "body": ["", "---", ""],
+    "description": "Línea separadora horizontal"
   }
 }
