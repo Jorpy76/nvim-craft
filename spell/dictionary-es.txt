@@ -559,3 +559,4 @@ email_to
 meterpreter_reverse_http
 Setear
 eth1
+Armitage

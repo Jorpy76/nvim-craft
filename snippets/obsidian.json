@@ -78,7 +78,7 @@
   },
   "Bash Block": {
     "prefix": "shell",
-    "body": ["```shell", "${1:comando}", "```", "$0"],
+    "body": ["```bash", "${1:comando}", "```", "$0"],
     "description": "Bloque de código Bash"
   },
   "Python Block": {
